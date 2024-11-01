@@ -8,27 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  SALE
-  RENT
-}
-
-enum PropertyType {
-  APARTMENT
-  HOUSE
-}
-
 enum UserRole {
   ADMIN
   USER
 }
 
 model Property {
-  id                String       @id @default(cuid())
-  slug              String       @unique
+  id                String   @id @default(cuid())
+  slug              String   @unique
   propertyTitle     String
-  status            Status
-  type              PropertyType
+  status            String
+  type              String
   area              Float
   rooms             Int
   price             Int
@@ -40,12 +30,12 @@ model Property {
   details           String
   buildingAge       Int?
   bedrooms          Int
-  hasParking        Boolean      @default(false)
-  hasSwimmingPool   Boolean      @default(false)
-  hasLaundryRoom    Boolean      @default(false)
-  hasWoodenCeiling  Boolean      @default(false)
-  hasCentralHeating Boolean      @default(false)
-  hasAlarm          Boolean      @default(false)
+  hasParking        Boolean  @default(false)
+  hasSwimmingPool   Boolean  @default(false)
+  hasLaundryRoom    Boolean  @default(false)
+  hasWoodenCeiling  Boolean  @default(false)
+  hasCentralHeating Boolean  @default(false)
+  hasAlarm          Boolean  @default(false)
 
   contactName  String
   contactEmail String

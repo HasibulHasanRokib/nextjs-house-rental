@@ -30,7 +30,7 @@ interface PropertyCardProps {
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
-    <Card>
+    <Card className="hover:bg-slate-50">
       <CardHeader>
         <Image
           className="rounded-md"

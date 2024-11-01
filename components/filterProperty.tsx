@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SearchCheck } from "lucide-react";
+import { CirclePlus, SearchCheck } from "lucide-react";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -10,16 +10,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { Button } from "./ui/button";
 import db from "@/lib/db";
+import { options } from "@/lib/types";
+import { propertyFilterSchema, PropertyFilterValue } from "@/lib/validation";
+import { redirect } from "next/navigation";
 
 async function filterProperty(formData: FormData) {
   "use server";
-  console.log(formData);
+  const value = Object.fromEntries(formData.entries());
+  const {
+    q,
+    status,
+    type,
+    city,
+    bedrooms,
+    bathrooms,
+    hasWoodenCeiling,
+    hasParking,
+    hasCentralHeating,
+    hasAlarm,
+    hasSwimmingPool,
+    hasLaundryRoom,
+  } = propertyFilterSchema.parse(value);
+  const searchParams = new URLSearchParams({
+    ...(q && { q: q.trim() }),
+    ...(status && { status }),
+    ...(type && { type }),
+    ...(city && { city }),
+    ...(bedrooms && { bedrooms }),
+    ...(bathrooms && { bathrooms }),
+    ...(hasWoodenCeiling && { hasWoodenCeiling: "true" }),
+    ...(hasParking && { hasParking: "true" }),
+    ...(hasCentralHeating && { hasCentralHeating: "true" }),
+    ...(hasAlarm && { hasAlarm: "true" }),
+    ...(hasSwimmingPool && { hasSwimmingPool: "true" }),
+    ...(hasLaundryRoom && { hasLaundryRoom: "true" }),
+  });
+  redirect(`/properties?${searchParams.toString()}`);
 }
 
-const FilterProperty = async () => {
+interface FilterPropertyProps {
+  defaultValues: PropertyFilterValue;
+}
+
+const FilterProperty = async ({ defaultValues }: FilterPropertyProps) => {
   const locations = (await db.property
     .findMany({
       select: { city: true },
@@ -41,10 +83,15 @@ const FilterProperty = async () => {
         <CardContent>
           <form action={filterProperty} className="my-3 space-y-3">
             {/* Search */}
-            <Input name="q" id="q" placeholder="Search here..." />
+            <Input
+              name="q"
+              id="q"
+              placeholder="Search here..."
+              defaultValue={defaultValues.q}
+            />
 
             {/* Property status */}
-            <Select name="status">
+            <Select name="status" defaultValue={defaultValues.status}>
               <SelectTrigger>
                 <SelectValue placeholder="Property status" />
               </SelectTrigger>
@@ -58,7 +105,7 @@ const FilterProperty = async () => {
             </Select>
 
             {/*  Property type */}
-            <Select name="type">
+            <Select name="type" defaultValue={defaultValues.type}>
               <SelectTrigger>
                 <SelectValue placeholder="Property type" />
               </SelectTrigger>
@@ -66,13 +113,13 @@ const FilterProperty = async () => {
                 <SelectGroup id="type">
                   <SelectLabel>Property type</SelectLabel>
                   <SelectItem value="houses">Houses</SelectItem>
-                  <SelectItem value="apartments">Apartments</SelectItem>
+                  <SelectItem value="apartment">Apartments</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             {/* City*/}
-            <Select name="city">
+            <Select name="city" defaultValue={defaultValues.city}>
               <SelectTrigger>
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
@@ -89,7 +136,7 @@ const FilterProperty = async () => {
             </Select>
 
             {/* Bedrooms */}
-            <Select name="bedrooms">
+            <Select name="bedrooms" defaultValue={defaultValues.bedrooms}>
               <SelectTrigger>
                 <SelectValue placeholder="Bedrooms" />
               </SelectTrigger>
@@ -105,7 +152,7 @@ const FilterProperty = async () => {
               </SelectContent>
             </Select>
             {/* Bathrooms*/}
-            <Select name="bathrooms">
+            <Select name="bathrooms" defaultValue={defaultValues.bathrooms}>
               <SelectTrigger>
                 <SelectValue placeholder="Bathrooms" />
               </SelectTrigger>
@@ -122,8 +169,39 @@ const FilterProperty = async () => {
             </Select>
 
             {/* More options */}
+            <Accordion type="single" collapsible>
+              <AccordionItem value="item-1">
+                <AccordionTrigger>
+                  <span className="flex items-center gap-3">
+                    <CirclePlus size={15} className="text-primary" />
+                    <p className="text-primary">Show more options</p>
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-2">
+                  {options.map((item) => {
+                    return (
+                      <div key={item.name} className="space-x-3">
+                        <input
+                          type="radio"
+                          name={item.name}
+                          className=" accent-emerald-600 "
+                          defaultChecked={
+                            defaultValues[
+                              item.name as keyof PropertyFilterValue
+                            ] === true
+                          }
+                        />
+                        <label className="text-balance">{item.label}</label>
+                      </div>
+                    );
+                  })}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
-            <Button type="submit">Search property</Button>
+            <Button type="submit" className="w-full">
+              Search property
+            </Button>
           </form>
         </CardContent>
       </Card>

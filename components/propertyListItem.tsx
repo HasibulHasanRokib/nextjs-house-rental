@@ -4,20 +4,9 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { FaBath, FaBed } from "react-icons/fa";
 import { BsBoundingBoxCircles } from "react-icons/bs";
 import { formatMoney, relativeData } from "@/lib/utils";
+import { Property } from "@prisma/client";
 interface PropertyCardTwoProps {
-  property: {
-    id: string;
-    propertyTitle: string;
-    bathrooms: number;
-    bedrooms: number;
-    imagesUrl: string[];
-    address: string;
-    city: string;
-    state: string;
-    createdAt: Date;
-    area: number;
-    price: number;
-  };
+  property: Property;
 }
 const PropertyListItem = ({ property }: PropertyCardTwoProps) => {
   return (
