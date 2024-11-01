@@ -84,6 +84,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-gray-700;
+    @apply bg-background text-slate-700;
   }
 }

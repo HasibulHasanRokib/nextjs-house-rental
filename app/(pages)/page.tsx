@@ -7,9 +7,28 @@ import { PiBuildingApartment } from "react-icons/pi";
 import { GiHouse, GiMechanicGarage } from "react-icons/gi";
 import { TbCoinTaka } from "react-icons/tb";
 import PropertyCard from "@/components/propertyCard";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import db from "@/lib/db";
+import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const properties = await db.property.findMany({
+    select: {
+      id: true,
+      propertyTitle: true,
+      bathrooms: true,
+      bedrooms: true,
+      imagesUrl: true,
+      address: true,
+      city: true,
+      state: true,
+      area: true,
+      price: true,
+      slug: true,
+      createdAt: true,
+    },
+  });
+
   return (
     <main className="flex flex-col space-y-20">
       {/* Hero section */}
@@ -30,17 +49,28 @@ export default function Home() {
         <MaxWidthWrapper className="flex flex-col space-y-10">
           <div>
             <p className="text-primary text-lg">Best Rent Properties</p>
-            <h2 className="font-semibold text-3xl">
+            <h3 className="font-semibold text-3xl">
               Featured <span className="text-primary">Properties</span>
-            </h2>
+            </h3>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <PropertyCard />
-            <PropertyCard />
-            <PropertyCard />
+            {properties.map((property) => {
+              return (
+                <Link href={`/properties/${property.slug}`} key={property.id}>
+                  <PropertyCard property={property} />
+                </Link>
+              );
+            })}
           </div>
           <div className="flex justify-center">
-            <Button>Show more</Button>
+            <Link
+              href={"/properties"}
+              className={buttonVariants({
+                variant: "default",
+              })}
+            >
+              Show more
+            </Link>
           </div>
         </MaxWidthWrapper>
       </section>
@@ -49,9 +79,9 @@ export default function Home() {
       <section>
         <MaxWidthWrapper className="flex flex-col space-y-10">
           <div>
-            <h2 className="font-semibold text-3xl ">
+            <h3 className="font-semibold text-3xl ">
               What are you <span className="text-primary">looking for ?</span>
-            </h2>
+            </h3>
           </div>
           <div className=" grid grid-cols-2">
             <div>
